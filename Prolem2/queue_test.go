@@ -2,7 +2,6 @@ package queue
 
 import (
 	"testing"
-	"fmt"
 )
 
 var testValues = []interface{}{
@@ -54,7 +53,7 @@ func TestPop(t *testing.T) {
 		t.Log("current: ", q.Keys())
 
 		v := q.Pop()
-
+		//t.Log("lentestValue %v qLen %v", len(testValues), (q.Len() + 1))
 		// validate
 		expect := testValues[len(testValues)-(q.Len()+1)]
 		if v != expect {
