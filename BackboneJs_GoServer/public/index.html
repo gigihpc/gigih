@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+	<meta charset="UTF-8">
+	<title>Backbone Tutorial Blogroll App</title>
+</head>
+<body>
+	<div class="container">
+		<h1>Backbone Tutorial</h1>
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Address</th>
+					<th>Old</th>
+					<th>Action</th>
+				</tr>
+				<tr>
+					<td><input class="form-control name-input"></td>
+					<td><input class="form-control address-input"></td>
+					<td><input class="form-control old-input"></td>
+					<td><button class="btn btn-primary add-mhsw">Add</button></td>
+				</tr>
+			</thead>
+			<tbody class="mhsw-list"></tbody>
+		</table>
+	</div>
+
+	<script type="text/template" class="mhsw-list-template">
+	<td><span class="name"><%= name %></span></td>
+	<td><span class="address"><%= address %></span></td>
+	<td><span class="old"><%= old %></span></td>
+	<td><button class="btn btn-warning edit-mhsw">Edit</button> <button class="btn btn-danger delete-mhsw">Delete</button><button class="btn btn-success update-mhsw" style="display:none">Update</button> <button class="btn btn-danger cancel" style="display:none">Cancel</button></td>
+
+	</script>
+	
+	<script src="bower_components/jquery/dist/jquery.js"></script>
+	<script src="bower_components/underscore/underscore.js"></script>
+	<script src="bower_components/backbone/backbone.js"></script>
+	<script src="js/scripts.js"></script>
+</body>
+</html>

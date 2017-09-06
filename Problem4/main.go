@@ -96,10 +96,6 @@ func makeRequest(c chan string){
 	}
 }
 
-func (data *Museum) saveCsv(){
-	data.Data[0]
-}
-
 func main() {
 	ch := make(chan string)
 	url := "http://jendela.data.kemdikbud.go.id/api/index.php/CWilayah/wilayahGET"
