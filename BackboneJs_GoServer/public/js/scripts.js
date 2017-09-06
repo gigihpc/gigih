@@ -15,7 +15,7 @@ var Mhsw = Backbone.Model.extend({
 // Backbone Collection
 
 var Mhsws = Backbone.Collection.extend({
-	url: 'http://localhost:8001/api/mhsws'
+	url: 'http://localhost:3003/api/mhsws'
 });
 
 // instantiate two Mhsws
@@ -109,7 +109,7 @@ var MhswView = Backbone.View.extend({
 		});
 	},
 	render: function() {
-		this.$el.html(this.template(this.model.attributes.data[0]))
+		//this.$el.html(this.template(this.model.attributes.data[0]))
 		//this.$el.html(this.template(this.model.toJSON()));
 		return this;
 	}
