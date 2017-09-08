@@ -13,11 +13,11 @@
 					<th>Action</th>
 				</tr>
 				<tr>
-                    <td><v-text-field id="namein"></v-text-field></td>
-					          <td><v-text-field id="addresin"></v-text-field></td>
-					          <td><v-text-field id="oldin"></v-text-field></td>
+                    <td><v-text-field v-model="name" id="namein"></v-text-field></td>
+					          <td><v-text-field v-model="address" id="addressin"></v-text-field></td>
+					          <td><v-text-field v-model="old" id="oldin"></v-text-field></td>
 					          <td><button class="btn btn-primary add" v-on:click.prevent="add">Add</button>
-                        <button class="btn btn-primary" v-on:click.prevent="fetchmhsws">SHOW ALL</button></td>
+                    <button class="btn btn-primary" v-on:click.prevent="fetchmhsws">SHOW ALL</button></td>
 				</tr>
                 <tr></tr>
                 <tr>
@@ -49,8 +49,7 @@ export default {
       name: '',
       address: '',
       old: '',
-      result: [],
-      error: [],
+      mhsw: [],
       mhsws: []
     }
   },
@@ -62,7 +61,6 @@ export default {
       HTTP.get('/api/mhsws').then(response => {
         this.result = response.data
         this.result.data.forEach(function (element) {
-          console.log(element.id + ';' + element.name + ';' + element.address + ';' + element.old)
         }, this)
       })
       .catch(e => {
@@ -78,11 +76,19 @@ export default {
       })
     },
     add () {
-      this.name = document.getElementById('namein')
-      this.address = document.getElementById('addressin')
-      this.old = document.getElementById('oldin')
-      console.log(document.getElementById('namein') + ';' + document.getElementById('addressin') + ';' + document.getElementById('oldin'))
-      console.log(this.name + ';' + this.address + ';' + this.old)
+      this.mhsw = [this.name, this.address, this.old]
+      var name = this.name
+      var address = this.address
+      var old = this.old
+      var mhswJson = {name, address, old}
+      console.log(JSON.parse(JSON.stringify(mhswJson)))
+      HTTP.post('/api/mhsws', JSON.parse(JSON.stringify(this.mhsw)))
+      .then(function (response) {
+        console.log(response.data.data)
+      })
+      .catch(function (err) {
+        console.log(err)
+      })
     },
     edit () {},
     remove () {},

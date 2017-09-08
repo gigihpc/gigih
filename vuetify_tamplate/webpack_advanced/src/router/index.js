@@ -29,7 +29,7 @@ export default new Router({
 })
 
 export const HTTP = axios.create({
-  baseURL: 'http://localhost:8001',
+  baseURL: 'http://192.168.1.8:8001',
   timeout: 1000,
   withCredentials: true
 })
