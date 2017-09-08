@@ -13,22 +13,23 @@
 					<th>Action</th>
 				</tr>
 				<tr>
-                    <td><v-text-field v-model="name"></v-text-field></td>
-                    <td><v-text-field v-model="address"></v-text-field></td>
-                    <td><v-text-field v-model="old"></v-text-field></td>
-					<td><button class="btn btn-primary add" @click="add">Add</button>
-                    <button class="btn btn-warning edit" @click="edit">Edit</button><button class="btn btn-danger remove" @click="remove">Remove</button>
-                    <button class="btn btn-primary"@click="fetchmhsws">SHOW ALL</button>
-                    <button class="btn btn-success update" @click="update" style="display:none">Update</button> 
-                    <button class="btn btn-danger cancel" @click="cancel" style="display:none">Cancel</button></td>
+                    <td><v-text-field id="namein"></v-text-field></td>
+					          <td><v-text-field id="addresin"></v-text-field></td>
+					          <td><v-text-field id="oldin"></v-text-field></td>
+					          <td><button class="btn btn-primary add" v-on:click.prevent="add">Add</button>
+                        <button class="btn btn-primary" v-on:click.prevent="fetchmhsws">SHOW ALL</button></td>
 				</tr>
                 <tr></tr>
                 <tr>
                     <template v-for="mhsw in mhsws">
                        <tr> 
-                         <td>{{mhsw.name}}</td>
-                         <td>{{mhsw.address}}</td>
-                         <td>{{mhsw.old}}</td>
+                         <td colspan="100%">{{mhsw.name}}</td>
+                         <td colspan="100%">{{mhsw.address}}</td>
+                         <td colspan="100%">{{mhsw.old}}</td>
+                         <td><button class="btn btn-warning edit" v:on:click="edit">Edit</button>
+                             <button class="btn btn-danger remove" v:on:click="remove">Remove</button>
+                             <button class="btn btn-success update" v:on:click="update">Update</button> 
+                             <button class="btn btn-danger cancel" v:on:click="cancel">Cancel</button></td>
                        </tr>
                     </template>
                 </tr>
@@ -69,7 +70,6 @@ export default {
       })
     },
     fetchmhsws: function () {
-      console.log('test')
       HTTP.get('/api/mhsws').then(response => {
         this.mhsws = response.data.data
       })
@@ -77,7 +77,13 @@ export default {
         console.log(err)
       })
     },
-    add () {},
+    add () {
+      this.name = document.getElementById('namein')
+      this.address = document.getElementById('addressin')
+      this.old = document.getElementById('oldin')
+      console.log(document.getElementById('namein') + ';' + document.getElementById('addressin') + ';' + document.getElementById('oldin'))
+      console.log(this.name + ';' + this.address + ';' + this.old)
+    },
     edit () {},
     remove () {},
     update () {},
