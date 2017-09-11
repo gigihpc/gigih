@@ -22,12 +22,12 @@
                 <tr></tr>
                 <tr>
                     <template v-for="mhsw in mhsws">
-                       <tr> 
+                       <tr>
                          <td colspan="100%">{{mhsw.name}}</td>
                          <td colspan="100%">{{mhsw.address}}</td>
                          <td colspan="100%">{{mhsw.old}}</td>
                          <td><button class="btn btn-warning edit" v:on:click="edit">Edit</button>
-                             <button class="btn btn-danger remove" v:on:click="remove">Remove</button>
+                             <button class="btn btn-primary remove" v:on:click.prevent="remove">Remove</button>
                              <button class="btn btn-success update" v:on:click="update">Update</button> 
                              <button class="btn btn-danger cancel" v:on:click="cancel">Cancel</button></td>
                        </tr>
@@ -81,8 +81,8 @@ export default {
       var address = this.address
       var old = this.old
       var mhswJson = {name, address, old}
-      console.log(JSON.parse(JSON.stringify(mhswJson)))
-      HTTP.post('/api/mhsws', JSON.parse(JSON.stringify(this.mhsw)))
+      console.log(JSON.stringify(mhswJson))
+      HTTP.post('/api/mhsws', JSON.stringify(mhswJson))
       .then(function (response) {
         console.log(response.data.data)
       })
@@ -91,7 +91,15 @@ export default {
       })
     },
     edit () {},
-    remove () {},
+    remove () {
+      console.log('test')
+      HTTP.delete('/api/mhsws/:id').then(response => {
+        console.log('succesfully delete: ' + response.data.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    },
     update () {},
     valid () {},
     cancel () {}
