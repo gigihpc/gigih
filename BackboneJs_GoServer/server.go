@@ -99,8 +99,15 @@ func (c *appContext) MahasiswaHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (c *appContext) createHandler(w http.ResponseWriter, r *http.Request) {
 	body := context.Get(r, "body").(*MahasiswaResource)
+	// log.Println(body.Data)
+	// if body.Data.Name == "" {
+	// 	panic("Data Not Access")
+	// }
 	repo := MahasiswaRepo{c.db.C("mhsws")}
 	err := repo.Create(&body.Data)
+
+	log.Println(err)
+
 	if err != nil {
 		panic(err)
 	}
@@ -221,6 +228,8 @@ func bodyHandler(v interface{}) func(http.Handler) http.Handler {
 			val := reflect.New(t).Interface()
 			err := json.NewDecoder(r.Body).Decode(val)
 
+			println("err: ", err.Error)
+
 			if err != nil {
 				WriteError(w, ErrBadRequest)
 				return
@@ -242,6 +251,21 @@ func bodyHandler(v interface{}) func(http.Handler) http.Handler {
 
 type router struct {
 	*httprouter.Router
+}
+
+func (r *router) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	if origin := req.Header.Get("Origin"); origin != "" {
+		rw.Header().Set("Access-Control-Allow-Origin", origin)
+		rw.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		rw.Header().Set("Access-Control-Allow-Headers", "content-type, Accept, X-XSRF-TOKEN,Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+		rw.Header().Set("Access-Control-Allow-Credentials", "true")
+	}
+	// Stop here if its Preflighted OPTIONS request
+	if req.Method == "OPTIONS" {
+		return
+	}
+	// Lets Gorilla work
+	r.Router.ServeHTTP(rw, req)
 }
 
 func (r *router) Get(path string, handler http.Handler) {
@@ -285,11 +309,14 @@ func main() {
 	//	panic(err)
 	//}
 	appC := appContext{session.DB("myproject")}
-	c := cors.New(cors.Options{AllowedOrigins: []string{"http://localhost:3003"}})
-	//mux := http.NewServeMux()
-	//mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	//	//w.Write([]byte("Success"))
-	//})
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://192.168.1.8:8080"},
+		AllowedMethods: []string{"GET", "PUT", "POST", "DELETE"},
+		AllowedHeaders: []string{"content-type", "Accept", "X-XSRF-TOKEN", "Content-Length", "Accept-Encoding", "X-CSRF-Token", "Authorization"},
+		//ExposedHeaders:   []string{"*", "/"},
+		AllowCredentials: true,
+	})
+
 	commonHandler := alice.New(context.ClearHandler, loggingHandler, recoverHandler, acceptHandler, c.Handler)
 
 	router := NewRouter()
