@@ -1,5 +1,5 @@
 <template>
-  <v-form v-model="valid">
+  <v-form>
       <title>VueJs</title>
 	<div class="container">
 		<h1>VueJs Tutorial</h1>
@@ -22,19 +22,23 @@
                 <tr></tr>
                 <tr>
                     <template v-for="mhsw in mhsws">
-                       <tr>
+                       <tr :key="mhsw.id">
+                         <td>{{mhsw.id}}</td>
                          <td colspan="100%">{{mhsw.name}}</td>
                          <td colspan="100%">{{mhsw.address}}</td>
                          <td colspan="100%">{{mhsw.old}}</td>
-                         <td><button class="btn btn-warning edit" v:on:click="edit">Edit</button>
-                             <button class="btn btn-primary remove" v:on:click.prevent="remove">Remove</button>
+                          <td><!--<button class="btn btn-warning edit" v:on:click.native=edit>Edit</button>
+                             <button class="btn btn-primary remove" v:on:click.prevent=remove>Remove</button>
                              <button class="btn btn-success update" v:on:click="update">Update</button> 
-                             <button class="btn btn-danger cancel" v:on:click="cancel">Cancel</button></td>
+                             <button class="btn btn-danger cancel" v:on:click="cancel">Cancel</button> -->
+                             <v-btn @click="edit">Edit</v-btn>
+                             <v-btn @click="remove">Remove</v-btn>
+                             <v-btn @click="update">Update</v-btn>
+                             <v-btn @click="cancel">Cancel</v-btn></td>
                        </tr>
                     </template>
                 </tr>
 			</thead>
-			<tbody class="mhsw-list"></tbody>
 		</table>
 	</div>
   </v-form>
@@ -42,8 +46,8 @@
 
 <script>
 import {HTTP} from '@/router/index'
+// import axios from 'axios'
 export default {
-  $validates: true,
   data () {
     return {
       name: '',
@@ -76,31 +80,46 @@ export default {
       })
     },
     add () {
-      this.mhsw = [this.name, this.address, this.old]
       var name = this.name
       var address = this.address
       var old = this.old
-      var mhswJson = {name, address, old}
-      console.log(JSON.stringify(mhswJson))
-      HTTP.post('/api/mhsws', JSON.stringify(mhswJson))
+      var mhswJson = {
+        data: {
+          name,
+          address,
+          old
+        }
+      }
+      console.log(mhswJson)
+      HTTP.post('/api/mhsws', mhswJson)
       .then(function (response) {
-        console.log(response.data.data)
+        console.log('succesfully')
       })
       .catch(function (err) {
-        console.log(err)
+        console.log(err.response)
       })
+      // axios.post('http://192.168.1.8:3003/api/mhsws', {name: 'suci', address: 'galek', old: '21'})
+      // .then(res => {
+      //   console.log('success')
+      // }).catch(err => {
+      //   console.log(err.res)
+      // })
     },
-    edit () {},
-    remove () {
+    edit: function () {
+      console.log('edit')
+    },
+    remove: function () {
       console.log('test')
       HTTP.delete('/api/mhsws/:id').then(response => {
         console.log('succesfully delete: ' + response.data.data)
       })
       .catch(err => {
-        console.log(err)
+        console.log(err.response)
       })
     },
-    update () {},
+    update () {
+      console.log('update')
+    },
     valid () {},
     cancel () {}
   },
