@@ -31,5 +31,6 @@ export default new Router({
 export const HTTP = axios.create({
   baseURL: 'http://192.168.1.8:8001',
   timeout: 1000,
-  withCredentials: true
+  withCredentials: true,
+  headers: {'Content-Type': 'application/json, text/plain, */*'}
 })

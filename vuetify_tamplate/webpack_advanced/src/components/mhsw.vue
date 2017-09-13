@@ -13,29 +13,31 @@
 					<th>Action</th>
 				</tr>
 				<tr>
-                    <td><v-text-field v-model="name" id="namein"></v-text-field></td>
-					          <td><v-text-field v-model="address" id="addressin"></v-text-field></td>
-					          <td><v-text-field v-model="old" id="oldin"></v-text-field></td>
+                    <td><v-text-field v-model="name"></v-text-field></td>
+					          <td><v-text-field v-model="address"></v-text-field></td>
+					          <td><v-text-field v-model="old"></v-text-field></td>
 					          <td><button class="btn btn-primary add" v-on:click.prevent="add">Add</button>
-                    <button class="btn btn-primary" v-on:click.prevent="fetchmhsws">SHOW ALL</button></td>
+                    <button class="btn btn-primary" v-on:click.prevent="show_all">SHOW ALL</button> </td>
 				</tr>
                 <tr></tr>
                 <tr>
-                    <template v-for="mhsw in mhsws">
+                    <template v-for="(mhsw,index) in mhsws">
                        <tr :key="mhsw.id">
-                         <td>{{mhsw.id}}</td>
-                         <td colspan="100%">{{mhsw.name}}</td>
-                         <td colspan="100%">{{mhsw.address}}</td>
-                         <td colspan="100%">{{mhsw.old}}</td>
+                         <td>{{mhsw.name}}</td>
+                         <td>{{mhsw.address}}</td>
+                         <td>{{mhsw.old}}</td>
                           <td><!--<button class="btn btn-warning edit" v:on:click.native=edit>Edit</button>
                              <button class="btn btn-primary remove" v:on:click.prevent=remove>Remove</button>
                              <button class="btn btn-success update" v:on:click="update">Update</button> 
                              <button class="btn btn-danger cancel" v:on:click="cancel">Cancel</button> -->
-                             <v-btn @click="edit">Edit</v-btn>
-                             <v-btn @click="remove">Remove</v-btn>
-                             <v-btn @click="update">Update</v-btn>
-                             <v-btn @click="cancel">Cancel</v-btn></td>
+                             <v-btn v-if="edit_mhsw" @click="edit($event,index)">Edit</v-btn>
+                             <v-btn v-if="delete_mhsw" @click="remove($event,mhsw.id)">Delete</v-btn>
+                             <v-btn v-if="update_mhsw" @click="update($event,mhsw.id)">Update</v-btn>
+                             <v-btn v-if="cancel_mhsw" @click="cancel">Cancel</v-btn></td>
                        </tr>
+                    </template>
+                    <template>
+                       <tr v-if="update_mhsw" v-on="edit"><text-field-edit></text-field-edit></tr>
                     </template>
                 </tr>
 			</thead>
@@ -46,6 +48,7 @@
 
 <script>
 import {HTTP} from '@/router/index'
+import Vue from 'vue'
 // import axios from 'axios'
 export default {
   data () {
@@ -53,23 +56,25 @@ export default {
       name: '',
       address: '',
       old: '',
+      name_in: '',
+      address_in: '',
+      old_in: '',
       mhsw: [],
-      mhsws: []
+      mhsws: [],
+      update_mhsw: false,
+      cancel_mhsw: false,
+      edit_mhsw: false,
+      delete_mhsw: false
     }
   },
   ready: function () {
     this.fetchmhsws()
   },
   methods: {
-    showAll () {
-      HTTP.get('/api/mhsws').then(response => {
-        this.result = response.data
-        this.result.data.forEach(function (element) {
-        }, this)
-      })
-      .catch(e => {
-        console.log(e)
-      })
+    show_all: function () {
+      this.fetchmhsws()
+      this.edit_mhsw = true
+      this.delete_mhsw = true
     },
     fetchmhsws: function () {
       HTTP.get('/api/mhsws').then(response => {
@@ -79,7 +84,7 @@ export default {
         console.log(err)
       })
     },
-    add () {
+    add: function () {
       var name = this.name
       var address = this.address
       var old = this.old
@@ -93,7 +98,8 @@ export default {
       console.log(mhswJson)
       HTTP.post('/api/mhsws', mhswJson)
       .then(function (response) {
-        console.log('succesfully')
+        console.log('succesfully create mahasiswa')
+        this.fatchmhsws()
       })
       .catch(function (err) {
         console.log(err.response)
@@ -105,27 +111,69 @@ export default {
       //   console.log(err.res)
       // })
     },
-    edit: function () {
-      console.log('edit')
+    edit: function (event, index) {
+      this.update_mhsw = true
+      this.cancel_mhsw = true
+      this.edit_mhsw = !this.edit_mhsw
+      this.delete_mhsw = false
+      this.name_in = this.mhsws[index].name
+      this.address_in = this.mhsws[index].address
+      this.old_in = this.mhsws[index].old
     },
-    remove: function () {
-      console.log('test')
-      HTTP.delete('/api/mhsws/:id').then(response => {
-        console.log('succesfully delete: ' + response.data.data)
+    remove: function (event, _id) {
+      HTTP.delete('/api/mhsws/' + _id).then(response => {
+        console.log('succesfully delete _id: ' + _id)
+        this.fetchmhsws()
       })
       .catch(err => {
         console.log(err.response)
       })
     },
-    update () {
-      console.log('update')
+    update: function (event, _id) {
+      HTTP.get('/api/mhsws/' + _id).then(response => {
+        this.mhsw = response.data
+      })
+      .catch(err => {
+        console.log(err.response)
+      })
+      HTTP.put('/api/mhsws/' + _id, this.mhsw).then(response => {
+        console.log('success update _id:' + _id)
+      })
+      .catch(err => {
+        console.log(err.response)
+      })
     },
     valid () {},
-    cancel () {}
+    cancel: function () {
+      this.fetchmhsws()
+      this.update_mhsw = !this.update_mhsw
+      this.cancel_mhsw = !this.cancel_mhsw
+      this.edit_mhsw = true
+      this.delete_mhsw = true
+    }
   },
   event: {
     click () {}
   }
 
 }
+Vue.component('text-field-edit', {
+  template: '<tr><td><v-text-field v-model="name_in">this.name_in</v-text-field></td><td><v-text-field v-model="address_in">this.address_in</v-text-field></td><td><v-text-field v-model="old_in">this.old_in</v-text-field></td></tr>',
+  data: function () {
+    return {
+      name_in: '',
+      address_in: '',
+      old_in: ''
+    }
+  },
+  methods: {
+    edit: function (event, index, mhsw) {
+      this.fetchmhsws()
+      this.name_in = this.mhsws[index].name
+      this.address_in = this.mhsws[index].address
+      this.old_in = this.mhsws[index].old
+      console.log(this.name_in, this.address_in, this.old_in)
+    }
+  }
+})
 </script>

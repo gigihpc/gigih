@@ -99,10 +99,6 @@ func (c *appContext) MahasiswaHandler(w http.ResponseWriter, r *http.Request) {
 }
 func (c *appContext) createHandler(w http.ResponseWriter, r *http.Request) {
 	body := context.Get(r, "body").(*MahasiswaResource)
-	// log.Println(body.Data)
-	// if body.Data.Name == "" {
-	// 	panic("Data Not Access")
-	// }
 	repo := MahasiswaRepo{c.db.C("mhsws")}
 	err := repo.Create(&body.Data)
 
@@ -136,8 +132,8 @@ func (c *appContext) deleteHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	w.WriteHeader(204)
-	w.Write([]byte("\n"))
+	//w.WriteHeader(204)
+	//w.Write([]byte("\n"))
 }
 
 // Errors
@@ -228,7 +224,7 @@ func bodyHandler(v interface{}) func(http.Handler) http.Handler {
 			val := reflect.New(t).Interface()
 			err := json.NewDecoder(r.Body).Decode(val)
 
-			println("err: ", err.Error)
+			println("body: ", r.Body)
 
 			if err != nil {
 				WriteError(w, ErrBadRequest)
@@ -317,7 +313,7 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	commonHandler := alice.New(context.ClearHandler, loggingHandler, recoverHandler, acceptHandler, c.Handler)
+	commonHandler := alice.New( /*context.ClearHandler, loggingHandler, recoverHandler, acceptHandler,*/ c.Handler)
 
 	router := NewRouter()
 	router.Get("/api/mhsws/:id", commonHandler.ThenFunc(appC.MahasiswaHandler))
