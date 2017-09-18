@@ -16,29 +16,37 @@
                     <td><v-text-field v-model="name"></v-text-field></td>
 					          <td><v-text-field v-model="address"></v-text-field></td>
 					          <td><v-text-field v-model="old"></v-text-field></td>
-					          <td><button class="btn btn-primary add" v-on:click.prevent="add">Add</button>
-                    <button class="btn btn-primary" v-on:click.prevent="show_all">SHOW ALL</button> </td>
+					          <td><v-btn v-on:click.stop.prevent="add">Add</v-btn>
+                    <v-btn @click="show_all">SHOW ALL</v-btn> </td>
 				</tr>
                 <tr></tr>
-                <tr>
+                <tr v-if="edit_mhsw">
                     <template v-for="(mhsw,index) in mhsws">
                        <tr :key="mhsw.id">
-                         <td>{{mhsw.name}}</td>
-                         <td>{{mhsw.address}}</td>
-                         <td>{{mhsw.old}}</td>
-                          <td><!--<button class="btn btn-warning edit" v:on:click.native=edit>Edit</button>
-                             <button class="btn btn-primary remove" v:on:click.prevent=remove>Remove</button>
-                             <button class="btn btn-success update" v:on:click="update">Update</button> 
-                             <button class="btn btn-danger cancel" v:on:click="cancel">Cancel</button> -->
-                             <v-btn v-if="edit_mhsw" @click="edit($event,index)">Edit</v-btn>
-                             <v-btn v-if="delete_mhsw" @click="remove($event,mhsw.id)">Delete</v-btn>
-                             <v-btn v-if="update_mhsw" @click="update($event,mhsw.id)">Update</v-btn>
-                             <v-btn v-if="cancel_mhsw" @click="cancel">Cancel</v-btn></td>
+                         <td v-if="mhsw.id==key_id"><text-input v-model="name_in"></text-input></td>
+                         <td v-else>{{mhsw.name}}</td>
+                         <td v-if="mhsw.id==key_id"><text-input v-model="address_in"></text-input></td>
+                         <td v-else>{{mhsw.address}}</td>
+                         <td v-if="mhsw.id==key_id"><text-input v-model="old_in"></text-input></td>
+                         <td v-else>{{mhsw.old}}</td>
+
+                          <td><v-btn v-if="mhsw.id==key_id" @click="update($event,mhsw.id,mhsw)">Update</v-btn>
+                              <v-btn v-else @click="edit($event,index)">Edit</v-btn>
+                             <v-btn v-if="mhsw.id==key_id" @click="cancel">Cancel</v-btn>
+                             <v-btn v-else @click="remove($event,mhsw.id)">Delete</v-btn></td>
                        </tr>
                     </template>
-                    <template>
-                       <tr v-if="update_mhsw" v-on="edit"><text-field-edit></text-field-edit></tr>
-                    </template>
+                </tr>
+                <tr v-else>
+                  <template v-for="(mhsw,index) in mhsws">
+                    <tr :key="mhsw.id">
+                      <td>{{mhsw.name}}</td>
+                      <td>{{mhsw.address}}</td>
+                      <td>{{mhsw.old}}</td>
+                      <td><v-btn @click="edit($event,index)">Edit</v-btn>
+                             <v-btn @click="remove($event,mhsw.id)">Delete</v-btn></td>
+                    </tr>
+                  </template>
                 </tr>
 			</thead>
 		</table>
@@ -48,7 +56,7 @@
 
 <script>
 import {HTTP} from '@/router/index'
-import Vue from 'vue'
+import textinput from './text_input'
 // import axios from 'axios'
 export default {
   data () {
@@ -61,10 +69,11 @@ export default {
       old_in: '',
       mhsw: [],
       mhsws: [],
-      update_mhsw: false,
-      cancel_mhsw: false,
+      key_id: '',
       edit_mhsw: false,
-      delete_mhsw: false
+      components: {
+        'text-input': textinput
+      }
     }
   },
   ready: function () {
@@ -73,8 +82,7 @@ export default {
   methods: {
     show_all: function () {
       this.fetchmhsws()
-      this.edit_mhsw = true
-      this.delete_mhsw = true
+      // console.log('when showall edit is: ', this.edit_mhsw)
     },
     fetchmhsws: function () {
       HTTP.get('/api/mhsws').then(response => {
@@ -97,28 +105,25 @@ export default {
       }
       console.log(mhswJson)
       HTTP.post('/api/mhsws', mhswJson)
-      .then(function (response) {
+      .then(response => {
         console.log('succesfully create mahasiswa')
-        this.fatchmhsws()
+        this.fetchmhsws()
       })
       .catch(function (err) {
         console.log(err.response)
       })
-      // axios.post('http://192.168.1.8:3003/api/mhsws', {name: 'suci', address: 'galek', old: '21'})
-      // .then(res => {
-      //   console.log('success')
-      // }).catch(err => {
-      //   console.log(err.res)
-      // })
+      this.name = ''
+      this.address = ''
+      this.old = ''
+      // console.log('when add edit is: ', this.edit_mhsw)
     },
     edit: function (event, index) {
-      this.update_mhsw = true
-      this.cancel_mhsw = true
-      this.edit_mhsw = !this.edit_mhsw
-      this.delete_mhsw = false
+      this.edit_mhsw = true
+      this.key_id = this.mhsws[index].id
       this.name_in = this.mhsws[index].name
       this.address_in = this.mhsws[index].address
       this.old_in = this.mhsws[index].old
+      // console.log('when edit edit is: ', this.edit_mhsw)
     },
     remove: function (event, _id) {
       HTTP.delete('/api/mhsws/' + _id).then(response => {
@@ -128,28 +133,37 @@ export default {
       .catch(err => {
         console.log(err.response)
       })
+      // console.log('when delete edit is: ', this.edit_mhsw)
     },
-    update: function (event, _id) {
-      HTTP.get('/api/mhsws/' + _id).then(response => {
-        this.mhsw = response.data
-      })
-      .catch(err => {
-        console.log(err.response)
-      })
-      HTTP.put('/api/mhsws/' + _id, this.mhsw).then(response => {
+    update: function (event, _id, _mhsw) {
+      // console.log('in: ', this.name_in, this.address_in, this.old_in)
+      var name = this.name_in
+      var address = this.address_in
+      var old = this.old_in
+      // console.log('curr-mhsw: ', name, address, old)
+      var updateJson = {
+        data: {
+          name,
+          address,
+          old
+        }
+      }
+      // console.log('json: ', updateJson)
+      HTTP.put('/api/mhsws/' + _id, updateJson).then(response => {
         console.log('success update _id:' + _id)
+        this.fetchmhsws()
       })
       .catch(err => {
         console.log(err.response)
       })
+      this.edit_mhsw = false
+      // console.log('when update edit is: ', this.edit_mhsw)
     },
     valid () {},
     cancel: function () {
       this.fetchmhsws()
-      this.update_mhsw = !this.update_mhsw
-      this.cancel_mhsw = !this.cancel_mhsw
-      this.edit_mhsw = true
-      this.delete_mhsw = true
+      this.edit_mhsw = false
+      // console.log('when cancel edit is: ', this.edit_mhsw)
     }
   },
   event: {
@@ -157,23 +171,4 @@ export default {
   }
 
 }
-Vue.component('text-field-edit', {
-  template: '<tr><td><v-text-field v-model="name_in">this.name_in</v-text-field></td><td><v-text-field v-model="address_in">this.address_in</v-text-field></td><td><v-text-field v-model="old_in">this.old_in</v-text-field></td></tr>',
-  data: function () {
-    return {
-      name_in: '',
-      address_in: '',
-      old_in: ''
-    }
-  },
-  methods: {
-    edit: function (event, index, mhsw) {
-      this.fetchmhsws()
-      this.name_in = this.mhsws[index].name
-      this.address_in = this.mhsws[index].address
-      this.old_in = this.mhsws[index].old
-      console.log(this.name_in, this.address_in, this.old_in)
-    }
-  }
-})
 </script>
