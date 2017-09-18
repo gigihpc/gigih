@@ -1,9 +1,11 @@
-<script>
-import Vue from 'vue'
+<template>
+      <td><input v-bind:value="value" @input="updateValue($event.target.value)"></input></td>
+      <!-- <td><v-text-field v-bind:value="value" @input="updateValue($event.target.value)"></v-text-field></td> -->
+</template>
 
-Vue.component('text-input', {
-  template: `<td><input v-bind:value="value" @input="updateValue($event.target.value)"></input></td>`,
-  // template: `<td><v-text-field v-bind:value="value" @input="updateValue($event.target.value)"></v-text-field></td>`,
+<script>
+
+export default {
   props: {
     value: {
       type: String,
@@ -16,5 +18,5 @@ Vue.component('text-input', {
       this.$emit('input', value)
     }
   }
-})
+}
 </script>
