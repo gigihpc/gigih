@@ -59,6 +59,9 @@ import {HTTP} from '@/router/index'
 import textinput from './text_input'
 // import axios from 'axios'
 export default {
+  components: {
+    'text-input': textinput
+  },
   data () {
     return {
       name: '',
@@ -70,10 +73,7 @@ export default {
       mhsw: [],
       mhsws: [],
       key_id: '',
-      edit_mhsw: false,
-      components: {
-        'text-input': textinput
-      }
+      edit_mhsw: false
     }
   },
   ready: function () {
@@ -123,7 +123,7 @@ export default {
       this.name_in = this.mhsws[index].name
       this.address_in = this.mhsws[index].address
       this.old_in = this.mhsws[index].old
-      // console.log('when edit edit is: ', this.edit_mhsw)
+      console.log('when edit edit is: ', this.name_in, this.address_in, this.old_in)
     },
     remove: function (event, _id) {
       HTTP.delete('/api/mhsws/' + _id).then(response => {
@@ -136,11 +136,11 @@ export default {
       // console.log('when delete edit is: ', this.edit_mhsw)
     },
     update: function (event, _id, _mhsw) {
-      // console.log('in: ', this.name_in, this.address_in, this.old_in)
+      console.log('in: ', this.name_in, this.address_in, this.old_in)
       var name = this.name_in
       var address = this.address_in
       var old = this.old_in
-      // console.log('curr-mhsw: ', name, address, old)
+      console.log('curr-mhsw: ', name, address, old)
       var updateJson = {
         data: {
           name,
