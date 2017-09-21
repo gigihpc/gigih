@@ -1,21 +1,24 @@
 package main
 
-type Product interface{}
+type Product struct{}
 
 func (p Product) GetName() string {
-	
+	str := string("")
+	return str
 }
 
-type Factory interface{}
+type Factory struct{}
 
-func (f *Factory) CreateProduct() Product {}
+func (f *Factory) CreateProduct() Product {return Product{}}
 
 type CPU struct {
 	p     Product
 	model string
 }
 
-//func (c CPU) CPU(return func model(model){}){}
+func (c *CPU) CPU(model string){
+	c.model = model
+}
 func (c CPU) GetName() string {
 	return "CPU with model: " + c.model
 }
@@ -25,7 +28,7 @@ type Intel struct {
 }
 
 func (intl *Intel) CreateProduct() Product {
-	return CPU("Core i7")
+	return new(CPU).p
 }
 
 type GPU struct {
@@ -34,7 +37,10 @@ type GPU struct {
 	opengl bool
 }
 
-//func (g GPU) GPU(model string, supportOpenGL bool)
+func (g *GPU) GPU(model string, supportOpenGL bool){
+	g.model = model
+	g.opengl = supportOpenGL
+}
 func (g GPU) GetName() string {
 	s := string("GPU with model: " + g.model + "OpenGL?")
 	tmp := string("")
@@ -51,11 +57,11 @@ type NVidia struct {
 }
 
 func (n *NVidia) CreateProduct() Product {
-	return
+	return n.f.CreateProduct()
 }
 
 func describeProductFromFactory(f *Factory) {
-	p := f.CreateProduct()
-	println(p.GetName())
-	p = nil
+	product := f.CreateProduct()
+	println(product.GetName())
+	product = Product{}
 }
