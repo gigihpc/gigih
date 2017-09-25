@@ -2,6 +2,7 @@
   <v-form ref="form">
       <v-layout justify-center>
     <v-flex xs12 sm10 md8 lg6>
+      <li>{{ isfail }}</li>
     <v-text-field
       label="Email"
       v-model="email"
@@ -31,7 +32,8 @@ export default{
       email: null,
       password: null,
       user_list: [],
-      isShow: false
+      isShow: false,
+      isfail: ''
     }
   },
   methods: {
@@ -46,6 +48,9 @@ export default{
           if (email === element.email && pass === element.password) {
             console.log('Login Success!')
             this.$router.push('mhsw')
+          } else {
+            this.isfail = 'Login Failed !'
+            console.log('Login Failed!!')
           }
         }, this)
       })

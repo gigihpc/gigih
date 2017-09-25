@@ -1,61 +1,76 @@
 <template>
   <v-form>
-      <title>VueJs</title>
-	<div class="container">
-		<h1>VueJs Tutorial</h1>
+    <title>VueJs</title>
+    <div class="container">
+      <h1>VueJs Tutorial</h1>
 
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Address</th>
-					<th>Old</th>
-					<th>Action</th>
-				</tr>
-				<tr>
-                    <td><v-text-field v-model="name"></v-text-field></td>
-					          <td><v-text-field v-model="address"></v-text-field></td>
-					          <td><v-text-field v-model="old"></v-text-field></td>
-					          <td><v-btn v-on:click.stop.prevent="add">Add</v-btn>
-                    <v-btn @click="show_all">SHOW ALL</v-btn> </td>
-				</tr>
-                <tr></tr>
-                <tr v-if="edit_mhsw">
-                    <template v-for="(mhsw,index) in mhsws">
-                       <tr :key="mhsw.id">
-                         <td v-if="mhsw.id==key_id"><input v-model="name_in"></input></td>
-                         <td v-else>{{mhsw.name}}</td>
-                         <td v-if="mhsw.id==key_id"><input v-model="address_in"></input></td>
-                         <td v-else>{{mhsw.address}}</td>
-                         <td v-if="mhsw.id==key_id"><input v-model="old_in"></input></td>
-                         <td v-else>{{mhsw.old}}</td>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Old</th>
+            <th>Action</th>
+          </tr>
+          <tr>
+            <td>
+              <v-text-field v-model="name"></v-text-field>
+            </td>
+            <td>
+              <v-text-field v-model="address"></v-text-field>
+            </td>
+            <td>
+              <v-text-field v-model="old"></v-text-field>
+            </td>
+            <td>
+              <v-btn v-on:click.stop.prevent="add">Add</v-btn>
+              <v-btn @click="show_all">SHOW ALL</v-btn>
+            </td>
+          </tr>
+          <tr></tr>
+          <tr v-if="edit_mhsw">
+            <template v-for="(mhsw,index) in mhsws">
+              <tr :key="mhsw.id">
+                <td v-if="mhsw.id==key_id"><input v-model="name_in"></input>
+                </td>
+                <td v-else>{{mhsw.name}}</td>
+                <td v-if="mhsw.id==key_id"><input v-model="address_in"></input>
+                </td>
+                <td v-else>{{mhsw.address}}</td>
+                <td v-if="mhsw.id==key_id"><input v-model="old_in"></input>
+                </td>
+                <td v-else>{{mhsw.old}}</td>
 
-                          <td><v-btn v-if="mhsw.id==key_id" @click="update(mhsw.id,mhsw)">Update</v-btn>
-                              <v-btn v-else @click="edit(index)">Edit</v-btn>
-                             <v-btn v-if="mhsw.id==key_id" @click="cancel">Cancel</v-btn>
-                             <v-btn v-else @click="remove(mhsw.id)">Delete</v-btn></td>
-                       </tr>
-                    </template>
-                </tr>
-                <tr v-else>
-                  <template v-for="(mhsw,index) in mhsws">
-                    <tr :key="mhsw.id">
-                      <td>{{mhsw.name}}</td>
-                      <td>{{mhsw.address}}</td>
-                      <td>{{mhsw.old}}</td>
-                      <td><v-btn @click="edit(index)">Edit</v-btn>
-                             <v-btn @click="remove(mhsw.id)">Delete</v-btn></td>
-                    </tr>
-                  </template>
-                </tr>
-			</thead>
-		</table>
-	</div>
+                <td>
+                  <v-btn v-if="mhsw.id==key_id" @click="update(mhsw.id,mhsw)">Update</v-btn>
+                  <v-btn v-else @click="edit(index)">Edit</v-btn>
+                  <v-btn v-if="mhsw.id==key_id" @click="cancel">Cancel</v-btn>
+                  <v-btn v-else @click="remove(mhsw.id)">Delete</v-btn>
+                </td>
+              </tr>
+            </template>
+          </tr>
+          <tr v-else>
+            <template v-for="(mhsw,index) in mhsws">
+              <tr :key="mhsw.id">
+                <td>{{mhsw.name}}</td>
+                <td>{{mhsw.address}}</td>
+                <td>{{mhsw.old}}</td>
+                <td>
+                  <v-btn @click="edit(index)">Edit</v-btn>
+                  <v-btn @click="remove(mhsw.id)">Delete</v-btn>
+                </td>
+              </tr>
+            </template>
+          </tr>
+        </thead>
+      </table>
+    </div>
   </v-form>
 </template>
 
 <script>
-import {HTTP} from '@/router/index'
+import { HTTP } from '@/router/index'
 // import textinput from './text_input'
 // import axios from 'axios'
 export default {
@@ -88,9 +103,9 @@ export default {
       HTTP.get('/api/mhsws').then(response => {
         this.mhsws = response.data.data
       })
-      .catch(err => {
-        console.log(err)
-      })
+        .catch(err => {
+          console.log(err)
+        })
     },
     add: function () {
       var name = this.name
@@ -105,13 +120,13 @@ export default {
       }
       console.log(mhswJson)
       HTTP.post('/api/mhsws', mhswJson)
-      .then(response => {
-        console.log('succesfully create mahasiswa')
-        this.fetchmhsws()
-      })
-      .catch(function (err) {
-        console.log(err.response)
-      })
+        .then(response => {
+          console.log('succesfully create mahasiswa')
+          this.fetchmhsws()
+        })
+        .catch(function (err) {
+          console.log(err.response)
+        })
       this.name = ''
       this.address = ''
       this.old = ''
@@ -130,9 +145,9 @@ export default {
         console.log('succesfully delete _id: ' + _id)
         this.fetchmhsws()
       })
-      .catch(err => {
-        console.log(err.response)
-      })
+        .catch(err => {
+          console.log(err.response)
+        })
       // console.log('when delete edit is: ', this.edit_mhsw)
     },
     update: function (_id, _mhsw) {
@@ -153,13 +168,13 @@ export default {
         console.log('success update _id:' + _id)
         this.fetchmhsws()
       })
-      .catch(err => {
-        console.log(err.response)
-      })
+        .catch(err => {
+          console.log(err.response)
+        })
       this.edit_mhsw = false
       // console.log('when update edit is: ', this.edit_mhsw)
     },
-    valid () {},
+    valid () { },
     cancel: function () {
       this.fetchmhsws()
       this.edit_mhsw = false
@@ -167,7 +182,7 @@ export default {
     }
   },
   event: {
-    click () {}
+    click () { }
   }
 
 }
