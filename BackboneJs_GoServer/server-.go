@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"reflect"
@@ -19,7 +20,7 @@ type User struct {
 	ID       bson.ObjectId `json:"id,omitempty" bson:"_id,omitempty"`
 	Name     string        `json:"name"`
 	Email    string        `json:"email"`
-	Paswword string        `json:"password"`
+	Password string        `json:"password"`
 	Country  string        `json:"country"`
 }
 type UserCollection struct {
@@ -52,6 +53,22 @@ type MahasiswaRepo struct {
 
 //User
 func (r *UserRepo) Create(user *User) error {
+	if user.Name == "" || user.Email == "" || user.Password == "" || user.Country == "" {
+		err := string("")
+		if user.Name == "" {
+			err = err + "Name Empty, "
+		}
+		if user.Email == "" {
+			err = err + "Email Empty "
+		}
+		if user.Password == "" {
+			err = err + "Password Empty "
+		}
+		if user.Country == "" {
+			err = err + "Country Empty "
+		}
+		return errors.New("Data can't save because not complated becaused: " + err)
+	}
 	id := bson.NewObjectId()
 	_, err := r.coll.UpsertId(id, user)
 	if err != nil {
@@ -119,14 +136,18 @@ type appContext struct {
 func (c *appContext) createUserHandler(w http.ResponseWriter, r *http.Request) {
 	body := context.Get(r, "body").(*UserResource)
 	repo := UserRepo{c.db.C("user")}
+	// body, checkerr := checkBodyUser(body)
 	err := repo.Create(&body.Data)
 	log.Println(err)
 
 	if err != nil {
-		panic(err)
+		w.WriteHeader(203)
+		json.NewEncoder(w).Encode(body)
+		//panic(err)
+	} else {
+		w.WriteHeader(202)
+		json.NewEncoder(w).Encode(body)
 	}
-	w.WriteHeader(202)
-	json.NewEncoder(w).Encode(body)
 }
 func (c *appContext) UserHandler(w http.ResponseWriter, r *http.Request) {
 	repo := UserRepo{c.db.C("user")}
@@ -138,6 +159,36 @@ func (c *appContext) UserHandler(w http.ResponseWriter, r *http.Request) {
 	//w.Header().Set("Accept", "application/vnd.api+json")
 	json.NewEncoder(w).Encode(user)
 }
+
+/*func checkBodyUser(body *UserResource) (*UserResource, error) {
+	resbody := UserResource{}
+	err := error(nil)
+	if body.Data.Name == "" {
+		resbody.Data.Name = ""
+		err = errors.New("Name empty")
+	} else {
+		resbody.Data.Name = body.Data.Name
+	}
+	if body.Data.Paswword == "" {
+		resbody.Data.Password = ""
+		err = errors.New("Password Empty")
+	} else {
+		resbody.Data.Password = body.Data.Paswword
+	}
+	if body.Data.Email == "" {
+		resbody.Data.Email = ""
+		err = errors.New("Email Empty")
+	} else {
+		resbody.Data.Email = body.Data.Email
+	}
+	if body.Data.Country == "" {
+		resbody.Data.Country = ""
+		err = errors.New("Country Empty")
+	} else {
+		resbody.Data.Country = body.Data.Country
+	}
+	return &resbody, err
+}*/
 
 //Mahasiswa
 func (c *appContext) mhswHandler(w http.ResponseWriter, r *http.Request) {
