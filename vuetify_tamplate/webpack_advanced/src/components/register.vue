@@ -2,13 +2,14 @@
 <v-form>
     <v-layout justify-center>
     <v-flex xs12 sm10 md8 lg6>
+         <v-alert warning :value="isError" transition="scale-transition">{{err}}</v-alert>
           <v-text-field label="Full Name" v-model="name" required></v-text-field>
-          <v-text-field label="Email" v-model="email" placeholder="michel@gmail.com" required></v-text-field>
+          <v-text-field label="Email" v-model="email" :rules="[rules.required, rules.email]" placeholder="michel@gmail.com" required></v-text-field>
           <v-text-field label="Password" v-model="password" required :append-icon="isShow ? 'visibility' : 'visibility_off'"
               :append-icon-cb="() => (isShow = !isShow)"
               :type="isShow ? 'text' : 'password'"
               counter></v-text-field>
-          <v-select autocomplete label="Country" placeholder="Select..." :items="countries" v-model="country" ref="country"></v-select>
+          <v-select autocomplete label="Country" placeholder="Select..." :items="countries" v-model="country" ref="country" required></v-select>
           <v-btn v-on:click="submit">SUBMIT</v-btn>
           <v-btn v-on:click="cancel">CANCEL</v-btn>
     </v-flex>
@@ -26,32 +27,64 @@ export default {
       country: null,
       email: null,
       password: null,
-      isShow: false
+      isShow: false,
+      isError: false,
+      err: '',
+      rules: {
+        required: (value) => !!value || 'Required.',
+        email: (value) => {
+          const pattern = /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Invalid e-mail.'
+        }
+      }
     }
   },
   methods: {
     submit: function () {
       console.log('submit')
-      var name = this.name
-      var email = this.email
-      var password = this.password
-      var countries = this.countries
+      this.err = ''
+      let name = this.name
+      let email = this.email
+      let password = this.password
+      let country = this.country
       var userJson = {
         data: {
           name,
           email,
           password,
-          countries
+          country
         }
       }
+      // console.log(name, email, password, country)
       HTTP.post('/api/user', userJson)
       .then(response => {
-        console.log('succes create user with id: ' + response.data.data.id)
-        this.rule()
-        this.$router.push('login')
+        if (response.data.data.id) {
+          console.log('success create user with id: ' + response.data.data.id)
+          this.rule()
+          this.$router.push('login')
+        } else {
+          // let err
+          this.isError = true
+          if (response.data.data.name === '') {
+            this.err = 'Name '
+          }
+          if (response.data.data.email === '') {
+            this.err = this.err + 'Email '
+          }
+          if (response.data.data.password === '') {
+            this.err = this.err + 'Password '
+          }
+          if (response.data.data.country === '') {
+            this.err = this.err + 'Country'
+          }
+          this.err = this.err + ' can`t empty !!!'
+          // console.log('error is: ' + this.err)
+          console.log('User can`t saved')
+        }
+        // console.log('response from db: ' + response.data.data.name, response.data.data.email, response.data.data.password, response.data.data.country)
       })
-      .catch(err => {
-        console.log(err.response)
+      .catch(error => {
+        console.log(error.response)
       })
     },
     cancel: function () {
