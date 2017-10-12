@@ -64,7 +64,7 @@ func (g *GPU) GPU(model string, supportOpenGL bool) {
 }
 
 func (g *GPU) GetName() string {
-	s := string("GPU with model: " + g.model + "OpenGL?")
+	s := string("GPU with model: " + g.model + " OpenGL? ")
 	tmp := string("")
 	if g.opengl {
 		tmp = tmp + "YES"
@@ -91,4 +91,18 @@ func describeProductFromFactory(f *Factory) {
 	product = Product{}
 }
 
-func main() {}
+func main() {
+	var c *CPU = &CPU{Product{nil}, "Core i5"}
+	var gpu *GPU = &GPU{Product{nil}, "Nvidia", false}
+
+	println(c.GetName())
+	println(gpu.GetName())
+
+	var intl *Intel = &Intel{Factory{Product{nil}}}
+	product := intl.f.CreateProduct()
+	println(product.GetName())
+
+	var n_vid *NVidia = &NVidia{Factory{Product{nil}}}
+	product = n_vid.f.CreateProduct()
+	println(product.GetName())
+}

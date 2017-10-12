@@ -25,10 +25,25 @@ var Mhsw = mongoose.model('Mhsw');
 
 mhsw.save();
 */
+
+var allowCrossDomain = function(req, res, next) {
+	if(req.headers.origin) {
+        res.header('Access-Control-Allow-Origin', req.headers.origin);
+        oneof = true;
+    }
+    //res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+	res.header('Access-Control-Allow-Headers', 'Content-Type');
+	res.header('Access-Control-Allow-Credentials', 'true');
+
+    next();
+}
+
 var app = express();
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
+app.use(allowCrossDomain);
 
 // ROUTES
 
