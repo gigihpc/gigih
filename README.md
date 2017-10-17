@@ -6,3 +6,7 @@ Frontend Framework:
 
 Backend:
 -RestFul API with Go Languages
+
+Database:
+-Mongodb
+-Postgresql
